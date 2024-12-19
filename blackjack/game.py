@@ -1,11 +1,24 @@
-from ..Deck import Deck
+import sys
+import os
 
+# 一つ上のディレクトリをパスに追加
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Deck import Deck
+from enum import Enum
+
+class GameResult(Enum):
+    WIN = "win"
+    BLACKJACK = "blackjack"
+    LOSE = "lose"
+    DRAW = "draw"
+    
 class Blackjack:
 
     def __init__(self):
         self.deck = Deck()
         self.player_hand = [] # playerのハンド
         self.dealer_hand = [] # ディーラーのハンド
+        self.player_money = 1000 # 所持金
         pass
     
     def deal_initial_cards(self):
@@ -38,27 +51,27 @@ class Blackjack:
         # 勝敗判定
 
         if self.is_bust(self.player_hand):
-            return 'プレイヤーがバストしました。ディーラーの勝ちです.'
+            return GameResult.LOSE, 'プレイヤーがバストしました。ディーラーの勝ちです。'
         if self.is_bust(self.dealer_hand):
-            return 'Dealerがバストしました。プレイヤーの勝ちです.'
+            return GameResult.WIN, 'Dealerがバストしました。プレイヤーの勝ちです。'
         
         # ハンドの値を算出
         player_value = self.__hand_value(self.player_hand)
         dealer_value = self.__hand_value(self.dealer_hand)
 
-        if player_value ==dealer_value:
-            return '引き分けです。'
+        if player_value == dealer_value:
+            return GameResult.DRAW, '引き分けです。'
         
         if self.is_blackjack(self.dealer_hand):
-            return 'ディラーがブラックジャックです。ディーラーの勝ちです'
+            return GameResult.LOSE, 'ディラーがブラックジャックです。ディーラーの勝ちです。'
 
         if self.is_blackjack(self.player_hand):
-            return 'プレイヤーがブラックジャックです。プレイヤーの勝ちです'
+            return GameResult.BLACKJACK, 'プレイヤーがブラックジャックです。プレイヤーの勝ちです。'
         
         if player_value > dealer_value:
-            return 'プレイヤーの勝ちです'
+            return GameResult.WIN, 'プレイヤーの勝ちです。'
         else:
-            return 'ディーラーの勝ちです'
+            return GameResult.LOSE, 'ディーラーの勝ちです。'
 
     def reset(self):
         #残り枚数を確認し、少なくなっていたらデッキを再生成
@@ -89,6 +102,29 @@ class Blackjack:
 
         return value
     
+    def set_bet_money(self, bet_money):
+        # 掛け金の設定
+        try:
+            bet_money = int(bet_money)
+            if not (10 <= bet_money <= 500) or bet_money > self.player_money:
+                return False
+        except ValueError:
+            return False
+        self.bet_money = bet_money
+        return True
+    
+    def update_money(self, result):
+        # 所持金の更新
+        if result == GameResult.WIN:
+            self.player_money += self.bet_money
+        elif result == GameResult.LOSE:
+            self.player_money -= self.bet_money
+        elif result == GameResult.BLACKJACK:
+            self.player_money += self.bet_money * 1.5
+        elif result == GameResult.DRAW:
+            pass
+        
+        return
     
     def __print_hands(self, hands, name):
         print(f'{name}のハンド')

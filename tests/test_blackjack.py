@@ -17,3 +17,20 @@ def test_hand_value(hands, value):
     # 手札のスコア値をテスト
     game = Blackjack()
     assert game._Blackjack__hand_value(hands) == value
+
+@pytest.mark.parametrize(
+        "player_money, bet_money, output",
+
+        [
+            (200, 50,  True), # happy 
+            (50, 100, False), # 所持金を超えるケース
+            (50, 5, False), # 範囲外
+            (5000, 600, False)
+        ]
+)
+def test_bet_money(player_money, bet_money, output):
+    game = Blackjack()
+    game.player_money = player_money
+    success_f = game.set_bet_money(bet_money)
+    assert success_f is output
+
