@@ -9,7 +9,7 @@ while True:
     game.deal_initial_cards()
 
     while not game.is_bust(game.player_hand) and not game.is_blackjack(game.player_hand):
-        user_input = input('「h」でヒット、「s」でスタンド、「q」で終了です')
+        user_input = input('「h」でヒット、「s」でスタンド、「q」で終了です:')
 
         if user_input.lower() == 'q':
             print('ゲームを終了します。ありがとうございました。')
