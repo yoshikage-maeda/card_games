@@ -24,5 +24,7 @@
     ```
 
 1. 実行:
-   python play blackjack.py
 
+    ``` bash
+    python play blackjack.py
+    ```
