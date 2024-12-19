@@ -1,4 +1,4 @@
-from Deck import Deck
+from ..Deck import Deck
 
 class Blackjack:
 
