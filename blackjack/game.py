@@ -117,25 +117,33 @@ class Blackjack:
         # 掛け金の設定
         self.bet_money = int(bet_money)
     
+    def place_money(self):
+        # 掛け金分へらす
+        self.player_money -= self.bet_money
+    
+    def offer_insurance(self):
+        # インシュアランス処理
+        self.insurance = int(self.bet_money * 0.5)
+        self.player_money -= self.insurance
+
     def update_money(self, result, insurance_flg):
         # 所持金の更新
-        if result == GameResult.WIN:
-            self.player_money += self.bet_money
-        elif result == GameResult.LOSE:
-            self.player_money -= self.bet_money
-        elif result == GameResult.BLACKJACK:
-            self.player_money += int(self.bet_money * 1.5)
-        elif result == GameResult.DRAW:
-            pass
-        elif result == GameResult.SURRENDER:
-            self.player_money -= self.bet_money // 2
-        
+
         # インシュアランスの処理
         if insurance_flg:
             if self.is_blackjack(self.dealer_hand):
-                self.player_money += self.bet_money
-            else:
-                self.player_money -= int(self.bet_money * 0.5)
+                self.player_money += self.insurance * 3 # 掛け金とインシュアランスの費用が返却される
+                self.bet_money = 0
+                return 
+        if result == GameResult.WIN:
+            self.player_money += self.bet_money * 2
+        elif result == GameResult.BLACKJACK:
+            self.player_money += int(self.bet_money * 2.5)
+        elif result == GameResult.DRAW:
+            self.player_money += self.bet_money
+        elif result == GameResult.SURRENDER:
+            self.player_money += self.bet_money // 2
+        
         return
     
     def __out_hands_info(self, hands, name, initial_dealer_hand=False):

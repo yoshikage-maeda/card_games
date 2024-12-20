@@ -27,8 +27,9 @@ while True:
 
     # 掛け金の設定
     valid_func = partial(is_valid_bet_money, player_money=game.player_money) #部分適用して引数を入れる
-    bet_money = in_handler.get_user_input('掛け金を設定してください。最低掛け金は10$, 最大掛け金は500$です:', valid_func)
-    game.set_bet_money(bet_money)
+    bet_money = int(in_handler.get_user_input('掛け金を設定してください。最低掛け金は10$, 最大掛け金は500$です:', valid_func))
+    game.set_bet_money(bet_money) # 掛け金の設定
+    game.place_money() # 所持金から掛け金分減らす。
     
     # 初期カードの表示
     game.deal_initial_cards()
@@ -42,10 +43,12 @@ while True:
             even_flag = True
             logger.info('プレイヤーの手札がブラックジャックかつディーラがAのため、イーブンです!')
         else:
-            valid_func = partial(is_estimated_input, estimated_inputs=['y', 'n'])
-            user_input = in_handler.get_user_input('ディーラの手がAです。インシュアランスしますか。(y/n)?:', valid_func)
-            if user_input.lower() == 'y':
-                insurance_flg = True
+            if game.player_money > int(game.bet_money * 0.5): # インシュアランスができる所持金があるとき
+                valid_func = partial(is_estimated_input, estimated_inputs=['y', 'n'])
+                user_input = in_handler.get_user_input('ディーラの手がAです。インシュアランスしますか。(y/n)?:', valid_func)
+                if user_input.lower() == 'y':
+                    game.offer_insurance()
+                    insurance_flg = True
 
 
     # サレンダーの設定
@@ -55,8 +58,8 @@ while True:
     
     if surrender_flg is False:
         while not game.is_bust(game.player_hand) and not game.is_blackjack(game.player_hand):
-            valid_func = partial(is_estimated_input, estimated_inputs=['h', 's'])
-            user_input = in_handler.get_user_input('「h」でヒット、「s」でスタンド:', valid_func)
+            valid_func = partial(is_estimated_input, estimated_inputs=['h', 's', 'd'])
+            user_input = in_handler.get_user_input('「h」でヒット、「s」でスタンド、「d」でダブル:', valid_func)
 
             if user_input.lower() == 'h':
                 game.player_hit()
