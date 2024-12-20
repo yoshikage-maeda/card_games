@@ -57,12 +57,23 @@ while True:
     surrender_flg = user_input.lower() == 'y'
     
     if surrender_flg is False:
+        dowble_flg = False
         while not game.is_bust(game.player_hand) and not game.is_blackjack(game.player_hand):
-            valid_func = partial(is_estimated_input, estimated_inputs=['h', 's', 'd'])
-            user_input = in_handler.get_user_input('「h」でヒット、「s」でスタンド、「d」でダブル:', valid_func)
+            if game.player_money >= game.bet_money and dowble_flg is False and insurance_flg is False:
+                valid_func = partial(is_estimated_input, estimated_inputs=['h', 's', 'd'])
+                user_input = in_handler.get_user_input('「h」でヒット、「s」でスタンド、「d」でダブル:', valid_func)
+            else:
+                valid_func = partial(is_estimated_input, estimated_inputs=['h', 's'])
+                user_input = in_handler.get_user_input('「h」でヒット、「s」でスタンド:', valid_func)
 
             if user_input.lower() == 'h':
                 game.player_hit()
+            elif user_input.lower() =='d':
+                dowble_flg  = True
+                game.place_money()
+                game.set_bet_money(game.bet_money*2)
+                game.player_hit()
+                break
             else:
                 break
         # ディーラーがカードを引く
