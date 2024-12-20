@@ -24,20 +24,23 @@ class Blackjack:
     def deal_initial_cards(self):
         # 最初にプレイヤーとディーラーがお互いに２枚ずつカードを引く
         self.player_hand = [self.deck.draw() for _ in range(2)]
-        self.__print_hands(self.player_hand, 'プレイヤー')
+        message = self.__out_hands_info(self.player_hand, 'プレイヤー')
         self.dealer_hand = [self.deck.draw() for _ in range(2)]
-        self.__print_hands(self.dealer_hand, 'ディーラー')
+        message += self.__out_hands_info(self.dealer_hand, 'ディーラー', initial_dealer_hand = True)
+        print(message)
     
     def player_hit(self):
         # プレイヤーがカードを引く
         self.player_hand.append(self.deck.draw())
-        self.__print_hands(self.player_hand, 'プレイヤー')
+        message = self.__out_hands_info(self.player_hand, 'プレイヤー')
+        print(message)
 
     def dealer_hit(self):
         # ディーラーは手札の合計が17以下であればカードを引く
         while self.__hand_value(self.dealer_hand) < 17:
             self.dealer_hand.append(self.deck.draw())
-        self.__print_hands(self.dealer_hand, 'ディーラー')
+        message = self.__out_hands_info(self.dealer_hand, 'ディーラー')
+        print(message)
     
     def is_bust(self, hand):
         # バストしているか判定
@@ -126,9 +129,13 @@ class Blackjack:
         
         return
     
-    def __print_hands(self, hands, name):
-        print(f'{name}のハンド')
-        for hand in hands:
-            print(f'{hand.suit}_{hand.rank}', end=' ')
-        print()
+    def __out_hands_info(self, hands, name, initial_dealer_hand=False):
+        message = f'{name}のハンド\n'
+        if initial_dealer_hand:
+            message += f'{hands[0].suit}_{hands[0].rank}'
+        else:
+            for hand in hands:
+                message += f'{hand.suit}_{hand.rank} '
+        message += '\n'
+        return message
 

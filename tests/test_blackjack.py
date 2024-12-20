@@ -34,3 +34,17 @@ def test_bet_money(player_money, bet_money, output):
     success_f = game.set_bet_money(bet_money)
     assert success_f is output
 
+@pytest.mark.parametrize(
+    "hands_ranks, first_hands_f, who,  expected_hands_num",
+    [
+        (['4', '3', '5'], False, 'プレイヤー', 3),
+        (['2', 'J'], True, 'ディーラー', 1)
+    ]
+)
+
+def test_out_message(hands_ranks, first_hands_f, who, expected_hands_num):
+    game = Blackjack()
+    hands = [Card('♥', rank) for rank in hands_ranks]
+    
+    message = game._Blackjack__out_hands_info(hands, who, first_hands_f)
+    assert len(message.split('_')) - 1 == expected_hands_num
