@@ -112,14 +112,7 @@ class Blackjack:
     
     def set_bet_money(self, bet_money):
         # 掛け金の設定
-        try:
-            bet_money = int(bet_money)
-            if not (10 <= bet_money <= 500) or bet_money > self.player_money:
-                return False
-        except ValueError:
-            return False
-        self.bet_money = bet_money
-        return True
+        self.bet_money = int(bet_money)
     
     def update_money(self, result):
         # 所持金の更新

@@ -1,6 +1,8 @@
 from blackjack import Blackjack
 import logging
 import datetime
+from util import InputHandler, is_estimated_input, is_valid_bet_money
+from functools import partial
 
 # ロガーの設定
 logging.basicConfig(
@@ -16,39 +18,30 @@ logger = logging.getLogger(__name__)
 
 logger.info('ブラックジャックへようこそ')
 game =  Blackjack()
+in_handler = InputHandler()
 
 while True:
     logger.info('--------------------------------')
     logger.info('新しいラウンド')
     logger.info(f'現在の所持金:{game.player_money}')
-    while True:
-        bet_money = input('掛け金を設定してください。最低掛け金は10$, 最大掛け金は500$です:')
-        suceed_flag = game.set_bet_money(bet_money)
-        if suceed_flag:
-            break
-        else:
-            logger.info('掛け金が正しく設定されていません。')
+
+    # 掛け金の設定
+    valid_func = partial(is_valid_bet_money, player_money=game.player_money) #部分適用して引数を入れる
+    bet_money = in_handler.get_user_input('掛け金を設定してください。最低掛け金は10$, 最大掛け金は500$です:', valid_func)
+    game.set_bet_money(bet_money)
+    
+    # 初期カードの表示
     game.deal_initial_cards()
 
-    while True:
-        user_input = input('ハンドが公開されました。サレンダーしますか。(y/n)?:')
-        if user_input.lower() =='y':
-            surrender_flg = True
-            break
-        elif user_input.lower() =='n':
-            surrender_flg = False
-            break
-        else:
-            logger.info('不正な入力です。もう一度入力してください')
-            continue
+    # サレンダーの設定
+    valid_func = partial(is_estimated_input, estimated_inputs=['y', 'n'])
+    user_input = in_handler.get_user_input('ハンドが公開されました。サレンダーしますか。(y/n)?:', valid_func)
+    surrender_flg = user_input.lower() == 'y'
     
     if surrender_flg is False:
         while not game.is_bust(game.player_hand) and not game.is_blackjack(game.player_hand):
-            user_input = input('「h」でヒット、「s」でスタンド:')
-
-            if user_input.lower() not in ['h', 's', 'sr']:
-                logger.info('不正な入力です。もう一度入力してください')
-                continue
+            valid_func = partial(is_estimated_input, estimated_inputs=['h', 's'])
+            user_input = in_handler.get_user_input('「h」でヒット、「s」でスタンド:', valid_func)
 
             if user_input.lower() == 'h':
                 game.player_hit()

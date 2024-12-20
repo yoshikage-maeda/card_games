@@ -1,6 +1,7 @@
 import pytest
 from ..blackjack import Blackjack
 from ..Deck import Card
+from util import is_valid_bet_money
 
 @pytest.mark.parametrize(
         "hands, value",
@@ -28,11 +29,8 @@ def test_hand_value(hands, value):
             (5000, 600, False)
         ]
 )
-def test_bet_money(player_money, bet_money, output):
-    game = Blackjack()
-    game.player_money = player_money
-    success_f = game.set_bet_money(bet_money)
-    assert success_f is output
+def test_is_valid_bet_money(player_money, bet_money, output):
+    assert is_valid_bet_money(bet_money, player_money) is output
 
 @pytest.mark.parametrize(
     "hands_ranks, first_hands_f, who,  expected_hands_num",
