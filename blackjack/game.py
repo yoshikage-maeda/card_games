@@ -51,9 +51,12 @@ class Blackjack:
         # ブラックジャックかどうか判定
         return self.__hand_value(hand) == 21
     
-    def check_winner(self, surrender_flg):
+    def check_winner(self, surrender_flg, even_flg):
         if surrender_flg:
             return GameResult.SURRENDER, 'サレンダーを選択したので、掛け金の半額を返金します。'
+        if even_flg:
+            return GameResult.WIN, 'イーブンのため、掛け金分の勝ちです。'
+        
 
         # 勝敗判定
         if self.is_bust(self.player_hand) and self.is_bust(self.dealer_hand):
@@ -114,7 +117,7 @@ class Blackjack:
         # 掛け金の設定
         self.bet_money = int(bet_money)
     
-    def update_money(self, result):
+    def update_money(self, result, insurance_flg):
         # 所持金の更新
         if result == GameResult.WIN:
             self.player_money += self.bet_money
@@ -127,6 +130,12 @@ class Blackjack:
         elif result == GameResult.SURRENDER:
             self.player_money -= self.bet_money // 2
         
+        # インシュアランスの処理
+        if insurance_flg:
+            if self.is_blackjack(self.dealer_hand):
+                self.player_money += self.bet_money
+            else:
+                self.player_money -= int(self.bet_money * 0.5)
         return
     
     def __out_hands_info(self, hands, name, initial_dealer_hand=False):

@@ -33,6 +33,21 @@ while True:
     # 初期カードの表示
     game.deal_initial_cards()
 
+    # イーブンとインシュアランスの処理
+    even_flag = False
+    insurance_flg = False
+    if game.dealer_hand[0].rank == 'A':
+        # イーブンの処理
+        if game.is_blackjack(game.player_hand):
+            even_flag = True
+            logger.info('プレイヤーの手札がブラックジャックかつディーラがAのため、イーブンです!')
+        else:
+            valid_func = partial(is_estimated_input, estimated_inputs=['y', 'n'])
+            user_input = in_handler.get_user_input('ディーラの手がAです。インシュアランスしますか。(y/n)?:', valid_func)
+            if user_input.lower() == 'y':
+                insurance_flg = True
+
+
     # サレンダーの設定
     valid_func = partial(is_estimated_input, estimated_inputs=['y', 'n'])
     user_input = in_handler.get_user_input('ハンドが公開されました。サレンダーしますか。(y/n)?:', valid_func)
@@ -50,9 +65,9 @@ while True:
         # ディーラーがカードを引く
         game.dealer_hit()
 
-    result, result_print = game.check_winner(surrender_flg) # 結果の確認
+    result, result_print = game.check_winner(surrender_flg, even_flag) # 結果の確認
     logger.info(result_print)
-    game.update_money(result) # 所持金の更新
+    game.update_money(result, insurance_flg) # 所持金の更新
     logger.info(f'現在の所持金:{game.player_money}')
     if game.player_money < 10:
         logger.info('所持金が最低掛け金より少なくなりました。Game Overです。')
