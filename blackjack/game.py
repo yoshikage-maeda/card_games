@@ -52,11 +52,12 @@ class Blackjack:
     
     def check_winner(self):
         # 勝敗判定
-
-        if self.is_bust(self.player_hand):
+        if self.is_bust(self.player_hand) and self.is_bust(self.dealer_hand):
+            return GameResult.LOSE, 'プレイヤーとディーラーどちらもバーストしました。ディーラーの勝ちです。'
+        elif self.is_bust(self.player_hand):
             return GameResult.LOSE, 'プレイヤーがバストしました。ディーラーの勝ちです。'
-        if self.is_bust(self.dealer_hand):
-            return GameResult.WIN, 'Dealerがバストしました。プレイヤーの勝ちです。'
+        elif self.is_bust(self.dealer_hand):
+            return GameResult.WIN, 'ディーラーがバストしました。プレイヤーの勝ちです。'
         
         # ハンドの値を算出
         player_value = self.__hand_value(self.player_hand)
@@ -66,7 +67,7 @@ class Blackjack:
             return GameResult.DRAW, '引き分けです。'
         
         if self.is_blackjack(self.dealer_hand):
-            return GameResult.LOSE, 'ディラーがブラックジャックです。ディーラーの勝ちです。'
+            return GameResult.LOSE, 'ディーラーがブラックジャックです。ディーラーの勝ちです。'
 
         if self.is_blackjack(self.player_hand):
             return GameResult.BLACKJACK, 'プレイヤーがブラックジャックです。プレイヤーの勝ちです。'
