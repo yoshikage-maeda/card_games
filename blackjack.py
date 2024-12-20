@@ -30,20 +30,34 @@ while True:
             logger.info('掛け金が正しく設定されていません。')
     game.deal_initial_cards()
 
-    while not game.is_bust(game.player_hand) and not game.is_blackjack(game.player_hand):
-        user_input = input('「h」でヒット、「s」でスタンドです:')
-
-        if user_input.lower() not in ['h', 's']:
+    while True:
+        user_input = input('ハンドが公開されました。サレンダーしますか。(y/n)?:')
+        if user_input.lower() =='y':
+            surrender_flg = True
+            break
+        elif user_input.lower() =='n':
+            surrender_flg = False
+            break
+        else:
             logger.info('不正な入力です。もう一度入力してください')
             continue
-
-        if user_input.lower() == 'h':
-            game.player_hit()
-        else:
-            break
     
-    game.dealer_hit()
-    result, result_print = game.check_winner() # 結果の確認
+    if surrender_flg is False:
+        while not game.is_bust(game.player_hand) and not game.is_blackjack(game.player_hand):
+            user_input = input('「h」でヒット、「s」でスタンド:')
+
+            if user_input.lower() not in ['h', 's', 'sr']:
+                logger.info('不正な入力です。もう一度入力してください')
+                continue
+
+            if user_input.lower() == 'h':
+                game.player_hit()
+            else:
+                break
+        # ディーラーがカードを引く
+        game.dealer_hit()
+
+    result, result_print = game.check_winner(surrender_flg) # 結果の確認
     logger.info(result_print)
     game.update_money(result) # 所持金の更新
     logger.info(f'現在の所持金:{game.player_money}')

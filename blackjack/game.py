@@ -11,6 +11,7 @@ class GameResult(Enum):
     BLACKJACK = "blackjack"
     LOSE = "lose"
     DRAW = "draw"
+    SURRENDER = "surrender"
     
 class Blackjack:
 
@@ -50,7 +51,10 @@ class Blackjack:
         # ブラックジャックかどうか判定
         return self.__hand_value(hand) == 21
     
-    def check_winner(self):
+    def check_winner(self, surrender_flg):
+        if surrender_flg:
+            return GameResult.SURRENDER, 'サレンダーを選択したので、掛け金の半額を返金します。'
+
         # 勝敗判定
         if self.is_bust(self.player_hand) and self.is_bust(self.dealer_hand):
             return GameResult.LOSE, 'プレイヤーとディーラーどちらもバーストしました。ディーラーの勝ちです。'
@@ -124,9 +128,11 @@ class Blackjack:
         elif result == GameResult.LOSE:
             self.player_money -= self.bet_money
         elif result == GameResult.BLACKJACK:
-            self.player_money += self.bet_money * 1.5
+            self.player_money += int(self.bet_money * 1.5)
         elif result == GameResult.DRAW:
             pass
+        elif result == GameResult.SURRENDER:
+            self.player_money -= self.bet_money // 2
         
         return
     
